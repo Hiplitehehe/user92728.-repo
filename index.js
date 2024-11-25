@@ -1,3 +1,4 @@
+// Ensure you're using the correct binding name 'TYPE_STORE'
 export default {
   async fetch(request) {
     if (request.method === "POST") {
@@ -11,7 +12,7 @@ export default {
         }
 
         // Store the 'type' in Cloudflare KV
-        await TYPE_STORE.put("latest_type", body.type);
+        await TYPE_STORE.put("latest_type", body.type);  // TYPE_STORE is the KV binding
 
         return new Response(
           JSON.stringify({ message: "You sent this type:", type: body.type }),
