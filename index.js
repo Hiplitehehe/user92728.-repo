@@ -1,19 +1,8 @@
-// Assuming KV binding is named `TYPE_STORE`
 export default {
   async fetch(request) {
     if (request.method === "POST") {
       try {
-        const contentType = request.headers.get("Content-Type") || "";
-        
-        if (!contentType.includes("application/json")) {
-          return new Response(
-            JSON.stringify({ error: "Content-Type must be application/json" }),
-            { status: 400, headers: { "Content-Type": "application/json" } }
-          );
-        }
-
         const body = await request.json();
-
         if (!body.type) {
           return new Response(
             JSON.stringify({ error: "'type' field is required" }),
@@ -36,10 +25,10 @@ export default {
       }
     }
 
-    // GET method to retrieve the latest type value from KV
     if (request.method === "GET") {
+      // Retrieve the latest 'type' value from KV
       const latestType = await TYPE_STORE.get("latest_type");
-      
+
       return new Response(
         JSON.stringify({ message: "Latest type value", type: latestType }),
         { headers: { "Content-Type": "application/json" } }
