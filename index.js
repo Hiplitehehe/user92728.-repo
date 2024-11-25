@@ -1,45 +1,54 @@
+// Assuming KV binding is named `TYPE_STORE`
 export default {
-    async fetch(request) {
-        if (request.method === "POST") {
-            try {
-                const contentType = request.headers.get("Content-Type") || "";
-
-                // Ensure the content type is JSON
-                if (!contentType.includes("application/json")) {
-                    return new Response(
-                        JSON.stringify({ error: "Content-Type must be application/json" }),
-                        { status: 400, headers: { "Content-Type": "application/json" } }
-                    );
-                }
-
-                // Parse the request body
-                const body = await request.json();
-
-                // Check if 'type' is in the body
-                if (!body.type) {
-                    return new Response(
-                        JSON.stringify({ error: "'type' field is required" }),
-                        { status: 400, headers: { "Content-Type": "application/json" } }
-                    );
-                }
-
-                // Respond with the 'type'
-                return new Response(
-                    JSON.stringify({ message: "You sent this type:", type: body.type }),
-                    { headers: { "Content-Type": "application/json" } }
-                );
-            } catch (err) {
-                return new Response(
-                    JSON.stringify({ error: "Invalid JSON" }),
-                    { status: 400, headers: { "Content-Type": "application/json" } }
-                );
-            }
+  async fetch(request) {
+    if (request.method === "POST") {
+      try {
+        const contentType = request.headers.get("Content-Type") || "";
+        
+        if (!contentType.includes("application/json")) {
+          return new Response(
+            JSON.stringify({ error: "Content-Type must be application/json" }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+          );
         }
 
-        // Handle non-POST requests
+        const body = await request.json();
+
+        if (!body.type) {
+          return new Response(
+            JSON.stringify({ error: "'type' field is required" }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+          );
+        }
+
+        // Store the 'type' in Cloudflare KV
+        await TYPE_STORE.put("latest_type", body.type);
+
         return new Response(
-            JSON.stringify({ error: "Only POST requests are allowed" }),
-            { status: 405, headers: { "Content-Type": "application/json" } }
+          JSON.stringify({ message: "You sent this type:", type: body.type }),
+          { headers: { "Content-Type": "application/json" } }
         );
-    },
+      } catch (err) {
+        return new Response(
+          JSON.stringify({ error: "Invalid JSON" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // GET method to retrieve the latest type value from KV
+    if (request.method === "GET") {
+      const latestType = await TYPE_STORE.get("latest_type");
+      
+      return new Response(
+        JSON.stringify({ message: "Latest type value", type: latestType }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ error: "Only POST and GET requests are allowed" }),
+      { status: 405, headers: { "Content-Type": "application/json" } }
+    );
+  },
 };
