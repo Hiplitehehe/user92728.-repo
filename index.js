@@ -1,5 +1,4 @@
 // Declare the KV binding at the top
-const TYPE_STORE = TYPE_STORE;  // This connects the KV store binding to the worker
 
 export default {
   async fetch(request) {
