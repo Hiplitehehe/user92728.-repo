@@ -1,9 +1,8 @@
-// Declare the KV binding at the top
-
 export default {
   async fetch(request) {
     if (request.method === "POST") {
       try {
+        // Parse the incoming JSON body
         const body = await request.json();
         if (!body.type) {
           return new Response(
@@ -13,7 +12,7 @@ export default {
         }
 
         // Store the 'type' in Cloudflare KV
-        await TYPE_STORE.put("latest_type", body.type); // Save the type in KV store
+        await TYPE_STORE.put("latest_type", body.type);  // Save the type in KV store
 
         return new Response(
           JSON.stringify({ message: "You sent this type:", type: body.type }),
