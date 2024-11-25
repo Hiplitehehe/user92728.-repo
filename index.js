@@ -1,4 +1,6 @@
-// Ensure you're using the correct binding name 'TYPE_STORE'
+// Declare the KV binding at the top
+const TYPE_STORE = TYPE_STORE;  // This connects the KV store binding to the worker
+
 export default {
   async fetch(request) {
     if (request.method === "POST") {
@@ -12,7 +14,7 @@ export default {
         }
 
         // Store the 'type' in Cloudflare KV
-        await TYPE_STORE.put("latest_type", body.type);  // TYPE_STORE is the KV binding
+        await TYPE_STORE.put("latest_type", body.type); // Save the type in KV store
 
         return new Response(
           JSON.stringify({ message: "You sent this type:", type: body.type }),
