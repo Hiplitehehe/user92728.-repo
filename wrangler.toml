@@ -6,5 +6,5 @@ compatibility_date = "2024-11-25"
 # route = "https://api.yourdomain.com/*"
 
 [[kv_namespaces]]
-binding = "MESSAGE_KV"
+binding = "TYPE_STORE"
 id = "c88868e779b3440d86690eb075d9ed93"  
