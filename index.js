@@ -27,7 +27,20 @@ export default {
     }
 
     if (request.method === "GET") {
-      // Retrieve the latest 'type' value from KV
+      const url = new URL(request.url);
+      const requestedType = url.searchParams.get("type");
+
+      if (requestedType) {
+        // Retrieve the latest 'type' value from KV based on the query parameter
+        const latestType = await TYPE_STORE.get(requestedType);
+
+        return new Response(
+          JSON.stringify({ message: `Requested type: ${requestedType}`, type: latestType }),
+          { headers: { "Content-Type": "application/json" } }
+        );
+      }
+
+      // If no query parameter is provided
       const latestType = await TYPE_STORE.get("latest_type");
 
       return new Response(
