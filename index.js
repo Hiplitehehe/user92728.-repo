@@ -2,6 +2,7 @@ export default {
   async fetch(request, env) {
     const GITHUB_REPO_API = "https://api.github.com/repos/Hiplitehehe/Bhhhhh/contents/type.jsob";
     const GITHUB_TOKEN = env.GITHUB_TOKEN; // Retrieve GitHub token from environment variables
+    const USER_AGENT = "CloudflareWorker/1.0 (+https://hiplitehehe.workers.dev)"; // Custom user-agent
 
     if (request.method === "POST") {
       try {
@@ -17,7 +18,7 @@ export default {
         }
 
         const fileContent = JSON.stringify({ type: body.type }, null, 2);
-        const sha = await getFileSHA(GITHUB_REPO_API, GITHUB_TOKEN);
+        const sha = await getFileSHA(GITHUB_REPO_API, GITHUB_TOKEN, USER_AGENT);
 
         const fileResponse = await fetch(GITHUB_REPO_API, {
           method: "PUT",
@@ -25,6 +26,7 @@ export default {
             Authorization: `Bearer ${GITHUB_TOKEN}`,
             "Content-Type": "application/json",
             Accept: "application/vnd.github.v3+json",
+            "User-Agent": USER_AGENT, // Include custom user-agent
           },
           body: JSON.stringify({
             message: "Update type value",
@@ -62,6 +64,7 @@ export default {
           headers: {
             Authorization: `Bearer ${GITHUB_TOKEN}`,
             Accept: "application/vnd.github.v3+json",
+            "User-Agent": USER_AGENT, // Include custom user-agent
           },
         });
 
@@ -101,12 +104,13 @@ export default {
 };
 
 // Helper function to get the file SHA for updates
-async function getFileSHA(GITHUB_REPO_API, GITHUB_TOKEN) {
+async function getFileSHA(GITHUB_REPO_API, GITHUB_TOKEN, USER_AGENT) {
   const response = await fetch(GITHUB_REPO_API, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${GITHUB_TOKEN}`,
       Accept: "application/vnd.github.v3+json",
+      "User-Agent": USER_AGENT, // Include custom user-agent
     },
   });
 
@@ -115,4 +119,4 @@ async function getFileSHA(GITHUB_REPO_API, GITHUB_TOKEN) {
     return data.sha;
   }
   return null;
-}
+           }
